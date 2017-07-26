@@ -1,0 +1,40 @@
+{
+  "name": "serverless-issue-3965",
+  "version": "1.0.0",
+  "description": "Illustrate issue raised in 3965",
+  "author": "indieisaconcept <me@indieisaconcept.com> (http://indieisaconcept.com)",
+  "scripts": {
+    "clean": "trash ./test/coverage .nyc_output",
+    "test": "npm run lint && ava --verbose",
+    "test:tap": "npm run lint -- -f ./node_modules/eslint-tap > ./lint.tap && ava --verbose --tap > ./results.tap",
+    "pretest": "npm run clean",
+    "pretest:tap": "npm run pretest",
+    "lint": "eslint ./handler.js ./lib ./test",
+    "cover": "nyc ava",
+    "precover": "npm run pretest",
+    "postcover": "nyc report --reporter=html",
+    "serverless": "serverless"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/indieisaconcept/serverless-issue-3965"
+  },
+  "devDependencies": {
+    "ava": "0.21.0",
+    "eslint": "4.3.0",
+    "eslint-config-semistandard": "11.0.0",
+    "eslint-config-standard": "10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "3.5.0",
+    "eslint-plugin-react": "7.1.0",
+    "eslint-plugin-standard": "3.0.1",
+    "eslint-tap": "2.0.1",
+    "nyc": "11.0.3",
+    "serverless": "1.18.0",
+    "serverless-offline": "3.15.1",
+    "serverless-plugin-include-dependencies": "2.1.2",
+    "trash-cli": "1.4.0"
+  },
+  "private": true
+}

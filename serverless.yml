@@ -1,0 +1,110 @@
+plugins:
+  - serverless-offline
+  - serverless-plugin-include-dependencies
+
+# add service specific custom values here
+# for referencing elsewhere
+
+custom:
+
+    stage: ${opt:stage, self:provider.stage}
+    region: ${opt:region, self:provider.region}
+
+    service:
+      name: ${file(./package.json):name}
+      version: ${file(./package.json):version}
+
+    destinationStream: ${file(./config.js):_get.stream.name}
+
+service: ${self:custom.service.name}
+
+provider:
+
+  stage: dev
+
+  name: aws
+  region: ap-southeast-2
+  versionFunctions: false
+
+  # default lambda resource
+  # settings
+
+  runtime: nodejs6.10
+  memorySize: 128
+  timeout: 4
+
+  # environments vars to apply to all
+  # handlers
+
+  environment:
+    STAGE: ${self:custom.stage}
+
+  # create custom iam policies to ensure service
+  # has access to the correct resources
+
+  iamRoleStatements:
+
+    # allow access to retrieve information about
+    # the kinesis stream
+
+    - Effect : Allow
+      Action :
+        - kinesis:DescribeStream
+        - kinesis:GetRecords
+        - kinesis:GetShardIterator
+        - kinesis:ListStreams
+        - kinesis:PutRecords
+      Resource :
+        - "arn:aws:kinesis:${self:custom.region}:*:stream/${self:custom.destinationStream}"
+
+    - Effect : Allow
+      Action :
+        - kinesis:ListStreams
+      Resource :
+        - "*"
+
+  # required for auditing
+
+  stackTags:
+
+    # setup automatically
+
+    id: ${self:custom.service.name}-${self:custom.service.version}-${self:custom.stage}
+    service: ${self:custom.service.name}
+    version: ${self:custom.service.version}
+    environment: ${self:custom.stage}
+
+package:
+  exclude:
+
+    # ensures all files are excluded by default
+    # use include to add missing files
+
+    - "*"
+    - "*/**"
+
+  include:
+
+    - lib/**
+    - config.js
+
+    - .nvmrc         # required to ensure the version of node used
+                     # for build & deploy is the same as lambda env
+
+    # required for ci/cd build & deployment
+
+    - package.json
+    - serverless.yml
+
+functions:
+
+  # add your handlers here, ensure all paths
+  # are prefixed with ${self:service}
+
+  default:
+    handler: lib/default.handler
+    events:
+        - http:
+            path: ${self:service}
+            method: post
+            integration: lambda-proxy

@@ -1,0 +1,11 @@
+node_modules
+DS_store
+.DS_store
+.idea
+.npmrc
+npm-debug.log
+yarn-error.log
+.serverless
+*.tap
+.nyc_output
+./test/coverage

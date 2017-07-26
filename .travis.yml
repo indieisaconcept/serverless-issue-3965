@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+    - 6.10.0
+env:
+    - PACKAGE="serverless@latest"
+    - PACKAGE="autopilothq/serverless#preserve-context-when-executing-exported-function-from-.js-file"
+
+before_install: npm i
+install: npm i $PACKAGE
+before_script: npm test
+script: npm run serverless -- package
